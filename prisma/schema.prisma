@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum ContentType {
+  youtube
+  podcast
+}
+
+enum ContentFilter {
+  all
+  podcast_only
+  exclude_podcasts
+}
+
+enum RetentionPolicy {
+  keep
+  delete_immediate
+  delete_after_delay
+  delete_after_days
+}
+
+enum JobType {
+  poll_channel
+  download_video
+  jellyfin_sync
+  cleanup_video
+}
+
+enum JobStatus {
+  pending
+  running
+  completed
+  failed
+}
+
+model User {
+  id             String              @id @default(cuid())
+  name           String              @unique
+  jellyfinUserId String?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  subscriptions  ChannelAssignment[]
+}
+
+model Channel {
+  id                 String              @id @default(cuid())
+  name               String
+  slug               String              @unique
+  url                String              @unique
+  sourceId           String?
+  contentType        ContentType
+  contentFilter      ContentFilter       @default(all)
+  backlogCount       Int                 @default(5)
+  watchedPolicy      RetentionPolicy     @default(keep)
+  watchedDelayHours  Int                 @default(0)
+  unwatchedPolicy    RetentionPolicy     @default(keep)
+  unwatchedDays      Int                 @default(30)
+  keepIfPlaylisted   Boolean             @default(true)
+  keepIfPinned       Boolean             @default(true)
+  isActive           Boolean             @default(true)
+  canonicalPath      String
+  lastPolledAt       DateTime?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  assignments        ChannelAssignment[]
+  videos             Video[]
+
+  @@unique([name, contentType])
+}
+
+model ChannelAssignment {
+  id        String   @id @default(cuid())
+  channelId  String
+  userId     String
+  createdAt  DateTime @default(now())
+  channel    Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([channelId, userId])
+}
+
+model Video {
+  id                String    @id @default(cuid())
+  channelId         String
+  sourceVideoId     String
+  title             String
+  description       String?
+  thumbnailUrl      String?
+  durationSeconds   Int?
+  publishedAt       DateTime?
+  downloadedAt      DateTime?
+  filePath          String?
+  fileSizeBytes     Int?
+  jellyfinItemId    String?
+  isWatched         Boolean   @default(false)
+  watchedAt         DateTime?
+  isPinned          Boolean   @default(false)
+  isInPlaylist      Boolean   @default(false)
+  pendingDeletionAt DateTime?
+  deletedAt         DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  channel           Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@unique([channelId, sourceVideoId])
+}
+
+model Job {
+  id          String    @id @default(cuid())
+  type        JobType
+  status      JobStatus @default(pending)
+  payload     String
+  attempts    Int       @default(0)
+  runAfter    DateTime  @default(now())
+  lockedAt    DateTime?
+  lastError   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
