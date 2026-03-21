@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TubSubarr</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h1>TubSubarr</h1>
+            <p>Self-hosted YouTube and podcast subscription ingestion for Jellyfin.</p>
+          </div>
+        </div>
+        <form id="subscription-form" class="form-grid">
+          <input name="name" placeholder="Channel name" required />
+          <input name="url" placeholder="https://youtube.com/@channel" required />
+          <select name="contentType">
+            <option value="youtube">YouTube</option>
+            <option value="podcast">Podcast</option>
+          </select>
+          <input name="backlogCount" type="number" min="1" value="5" />
+          <select name="contentFilter">
+            <option value="all">All</option>
+            <option value="podcast_only">Podcast only</option>
+            <option value="exclude_podcasts">Exclude podcasts</option>
+          </select>
+          <label class="checkbox"><input type="checkbox" name="isActive" checked /> Active</label>
+          <div id="user-checkboxes" class="user-checkboxes"></div>
+          <button type="submit">Add subscription</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Subscriptions</h2>
+          <button id="refresh-subscriptions">Refresh</button>
+        </div>
+        <div id="subscriptions" class="card-list"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Videos</h2>
+          <button id="refresh-videos">Refresh</button>
+        </div>
+        <div id="videos" class="card-list"></div>
+      </section>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
