@@ -1,0 +1,32 @@
+services:
+  tubsubarr:
+    build: .
+    image: tubsubarr:local
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      DATABASE_URL: file:/app/prisma/dev.db
+      STORE_ROOT: /app/data/store
+      VIEW_ROOT: /app/data/views
+      TRASH_ROOT: /app/data/trash
+      JELLYFIN_BASE_URL: http://jellyfin:8096
+      JELLYFIN_API_KEY: change-me
+      CHANNEL_POLL_INTERVAL_MS: 300000
+      JELLYFIN_SYNC_INTERVAL_MS: 300000
+      CLEANUP_INTERVAL_MS: 3600000
+      TRASH_RETENTION_HOURS: 24
+    volumes:
+      - tubsubarr-data:/app/data
+      - tubsubarr-db:/app/prisma
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:4000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  tubsubarr-data:
+  tubsubarr-db:
