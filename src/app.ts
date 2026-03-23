@@ -5,7 +5,6 @@ import path from 'node:path';
 import subscriptionsRouter from './routes/subscriptions.js';
 import videosRouter from './routes/videos.js';
 import webhooksRouter from './routes/webhooks.js';
-import settingsRouter from './routes/settings.js';
 
 export function createApp() {
   const app = express();
@@ -18,7 +17,6 @@ export function createApp() {
   app.use('/subscriptions', subscriptionsRouter);
   app.use('/videos', videosRouter);
   app.use('/webhooks', webhooksRouter);
-  app.use('/settings', settingsRouter);
 
   app.use((error: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
     res.status(400).json({ error: error.message || 'Unexpected error' });
