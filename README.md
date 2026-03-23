@@ -1,6 +1,6 @@
 # TubeSubarr
 
-TubSubarr is a self-hosted Node.js + TypeScript MVP for managing YouTube or podcast channel subscriptions, downloading new videos with `yt-dlp`, exposing per-user Jellyfin views via symlinks, and applying cleanup rules.
+TubeSubarr is a self-hosted Node.js + TypeScript MVP for managing YouTube or podcast channel subscriptions, downloading new videos with `yt-dlp`, exposing per-user Jellyfin views via symlinks, and applying cleanup rules.
 
 ## Project structure
 
