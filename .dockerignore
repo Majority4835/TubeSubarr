@@ -1,11 +1,11 @@
 .git
 node_modules
 npm-debug.log
-Dockerfile*
-docker-compose*.yml
-docker-stack.yml
 .env
-.env.*
+.env.local
+.env.development
+.env.test
+.env.production
 data
 prisma/dev.db*
 dist

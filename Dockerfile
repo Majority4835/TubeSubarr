@@ -7,12 +7,11 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY package.json package-lock.json* tsconfig.json ./
+COPY package.json tsconfig.json ./
 COPY prisma ./prisma
 RUN npm install && npx prisma generate
 COPY src ./src
-COPY docker/entrypoint.sh ./docker/entrypoint.sh
-COPY .env.example ./.env
+COPY docker ./docker
 RUN npm run build
 
 EXPOSE 4000
