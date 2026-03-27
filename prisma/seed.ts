@@ -10,21 +10,6 @@ async function main() {
       create: { name },
     });
   }
-
-  await prisma.appSettings.upsert({
-    where: { id: 'default' },
-    update: {},
-    create: {
-      id: 'default',
-      includeShortsDefault: false,
-      keepAfterWatchedDefault: true,
-      unwatchedRetentionDaysDefault: 30,
-      searchResultLimitDefault: 10,
-      podcastTitleKeywordsDefault: 'podcast,episode,interview',
-      podcastMinLengthSecondsDefault: 900,
-      pauseDownloadsThresholdDefault: 50,
-    },
-  });
 }
 
 main()
