@@ -1,42 +1,46 @@
 # TubeSubarr
 
-TubeSubarr is a self-hosted Node.js + TypeScript MVP for managing YouTube channel subscriptions, downloading videos with `yt-dlp`, exposing per-user Jellyfin views via symlinks, and applying cleanup rules.
-
-## What changed in this refactor
-
-- The home page is now subscription-first: one smart search/add bar at the top and subscribed channels below it.
-- Channel names come from YouTube metadata, not manual entry.
-- Search results temporarily replace the subscriptions list and preserve the current query.
-- Channel-level settings are hidden behind an inline settings panel per subscription card.
-- App-wide defaults now live on a dedicated settings page and are applied to newly created channels.
+TubeSubarr is a self-hosted Node.js + TypeScript MVP for managing YouTube or podcast channel subscriptions, downloading new videos with `yt-dlp`, exposing per-user Jellyfin views via symlinks, and applying cleanup rules.
 
 ## Project structure
 
 ```text
 .
-├── docker/
-│   └── entrypoint.sh
 ├── prisma/
-│   ├── schema.prisma
-│   └── seed.ts
+│   ├── schema.prisma        # SQLite schema for users, channels, videos, jobs
+│   └── seed.ts              # Seeds local users (Lana, Richard, Shared)
 ├── src/
-│   ├── public/              # Smart-bar UI, subscriptions view, app defaults view
+│   ├── public/              # Simple subscriptions/videos UI
 │   ├── routes/              # REST API routes
-│   ├── services/            # Metadata lookup, settings, storage, Jellyfin, yt-dlp
+│   ├── services/            # Domain services for storage, yt-dlp, Jellyfin
 │   ├── workers/             # Queue + poll/download/sync/cleanup workers
-│   ├── app.ts
-│   ├── config.ts
-│   ├── db.ts
-│   └── server.ts
+│   ├── app.ts               # Express app factory
+│   ├── config.ts            # Environment/config loading
+│   ├── db.ts                # Prisma client
+│   └── server.ts            # Bootstrap + schedulers
 ├── Dockerfile
 ├── docker-compose.yml
-├── docker-stack.yml
 └── .env.example
 ```
 
-## API
+## MVP capabilities
 
-Existing API:
+- Multi-user local accounts with separate YouTube and Podcast Jellyfin views.
+- Canonical channel storage under `/store/.../channels/<channel-slug>` and user-specific symlinked Jellyfin views under `/views/.../<user>/<channel-slug>`.
+- REST API for subscriptions, videos, and Jellyfin webhook ingestion.
+- Background workers for channel polling, downloads, Jellyfin watched sync, and cleanup.
+- Cleanup rules for watched and stale-unwatched videos with a trash-first delete flow.
+- Minimal browser UI for subscriptions and video pin/watch actions.
+
+## Prisma schema highlights
+
+- `User`: local application/Jellyfin user mapping.
+- `Channel`: canonical channel subscription and retention settings.
+- `ChannelAssignment`: many-to-many user/channel ownership.
+- `Video`: download state, Jellyfin item ID, watch state, pin/playlist protection, delete timestamps.
+- `Job`: lightweight SQLite-backed job queue.
+
+## API
 
 - `GET /subscriptions`
 - `POST /subscriptions`
@@ -45,51 +49,6 @@ Existing API:
 - `GET /videos`
 - `PATCH /videos/:id`
 - `POST /webhooks/jellyfin`
-
-Added for the new UX:
-
-- `POST /subscriptions/resolve` — classify smart-bar input and return channel/search/video metadata.
-- `GET /subscriptions/:id/videos` — load videos for one subscribed channel.
-- `GET /settings`
-- `PATCH /settings`
-
-## New defaults + per-channel settings
-
-### App defaults
-
-- include/skip shorts
-- min/max video length
-- keep-after-watched behavior
-- unwatched retention
-- default search result limit
-- default podcast title keywords
-- default podcast min/max length rules
-- pause downloads when unwatched count exceeds a threshold
-
-### Per-channel settings
-
-- download only new videos
-- optional title filter
-- include YouTube Shorts
-- keep after watched
-- unwatched retention period
-- per-channel pause-download threshold override
-- media type toggles for Music / Show / Podcast
-- podcast title keyword rules
-- podcast min/max episode length rules
-
-## Migration notes
-
-Run Prisma schema sync again because the schema now includes:
-
-- a new `AppSettings` table for global defaults
-- new channel metadata fields (`avatarUrl`, `summary`)
-- new per-channel workflow fields (`downloadOnlyNewVideos`, `titleFilter`, `includeShorts`, `keepAfterWatched`, `unwatchedRetentionDays`, `pauseDownloadsThreshold`, and podcast/media flags)
-
-```bash
-npx prisma db push
-npm run seed
-```
 
 ## Run locally
 
@@ -106,21 +65,16 @@ npm run dev
 
 Open `http://localhost:4000`.
 
-### Docker Compose
+### Docker
 
 ```bash
 docker compose up --build
 ```
 
-### Docker Stack / Swarm
-
-```bash
-docker build -t tubesubarr:local .
-docker stack deploy -c docker-stack.yml tubesubarr
-```
+The container installs `ffmpeg` and `yt-dlp`, runs `prisma db push`, and starts the server on port `4000`.
 
 ## Notes
 
-- The current search implementation uses `yt-dlp` metadata resolution and `ytsearch`-based discovery.
-- The queue remains intentionally lightweight for MVP scope.
-- The main page no longer renders a global downloaded-videos list; videos only appear inside expanded channel cards.
+- Jellyfin libraries should already exist and point to `./data/views/youtube/<user>` and `./data/views/podcasts/<user>`.
+- The worker queue is intentionally simple for MVP scope; a production version should use stronger locking and retries.
+- `yt-dlp` integration uses child processes and JSON probing/download workflows that can be extended for richer metadata or search.

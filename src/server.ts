@@ -25,7 +25,7 @@ async function bootstrap() {
 
   const app = createApp();
   app.listen(config.port, () => {
-    console.log(`TubeSubarr listening on http://localhost:${config.port}`);
+    console.log(`TubSubarr listening on http://localhost:${config.port}`);
   });
 }
 

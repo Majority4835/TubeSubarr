@@ -1,11 +1,11 @@
 #!/bin/sh
 set -eu
 
-echo "[tubesubarr] applying prisma schema"
+echo "[tubsubarr] applying prisma schema"
 npx prisma db push --skip-generate
 
-echo "[tubesubarr] seeding default users"
+echo "[tubsubarr] seeding default users"
 npm run seed
 
-echo "[tubesubarr] starting server"
+echo "[tubsubarr] starting server"
 exec node dist/src/server.js
