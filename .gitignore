@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+prisma/dev.db
+prisma/dev.db-journal
+data/
