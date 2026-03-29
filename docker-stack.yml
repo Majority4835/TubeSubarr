@@ -1,6 +1,6 @@
 services:
   tubsubarr:
-    image: tubsubarr:local
+    image: tubesubarr:local
     environment:
       PORT: 4000
       DATABASE_URL: file:/app/prisma/dev.db
@@ -19,8 +19,8 @@ services:
         protocol: tcp
         mode: ingress
     volumes:
-      - tubsubarr-data:/app/data
-      - tubsubarr-db:/app/prisma
+      - tubesubarr-data:/app/data
+      - tubesubarr-db:/app/prisma
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:4000/health"]
       interval: 30s
@@ -33,5 +33,5 @@ services:
         condition: on-failure
 
 volumes:
-  tubsubarr-data:
-  tubsubarr-db:
+  tubesubarr-data:
+  tubesubarr-db:
