@@ -48,68 +48,39 @@ model User {
   subscriptions  ChannelAssignment[]
 }
 
-// App-wide defaults used by settingsService and Prisma appSettings delegate
-model AppSettings {
-  id                             String  @id
-  includeShortsDefault           Boolean @default(false)
-  minVideoLengthSecondsDefault   Int?
-  maxVideoLengthSecondsDefault   Int?
-  keepAfterWatchedDefault        Boolean @default(true)
-  unwatchedRetentionDaysDefault  Int     @default(30)
-  searchResultLimitDefault       Int     @default(10)
-  podcastTitleKeywordsDefault    String  @default("podcast,episode,interview")
-  podcastMinLengthSecondsDefault Int?    @default(900)
-  podcastMaxLengthSecondsDefault Int?
-  pauseDownloadsThresholdDefault Int?    @default(50)
-}
-
 model Channel {
-  id                      String              @id @default(cuid())
-  name                    String
-  slug                    String              @unique
-  url                     String              @unique
-  sourceId                String?
-  avatarUrl               String?
-  summary                 String?
-  contentType             ContentType
-  contentFilter           ContentFilter       @default(all)
-  backlogCount            Int                 @default(5)
-  watchedPolicy           RetentionPolicy     @default(keep)
-  watchedDelayHours       Int                 @default(0)
-  unwatchedPolicy         RetentionPolicy     @default(delete_after_days)
-  unwatchedDays           Int                 @default(30)
-  keepIfPlaylisted        Boolean             @default(true)
-  keepIfPinned            Boolean             @default(true)
-  isActive                Boolean             @default(true)
-  canonicalPath           String
-  lastPolledAt            DateTime?
-  downloadOnlyNewVideos   Boolean             @default(true)
-  titleFilter             String?
-  includeShorts           Boolean             @default(false)
-  keepAfterWatched        Boolean             @default(true)
-  unwatchedRetentionDays  Int                 @default(30)
-  pauseDownloadsThreshold Int?
-  mediaMusic              Boolean             @default(false)
-  mediaShow               Boolean             @default(false)
-  mediaPodcast            Boolean             @default(false)
-  podcastTitleKeywords    String?
-  podcastMinLengthSeconds Int?
-  podcastMaxLengthSeconds Int?
-  createdAt               DateTime            @default(now())
-  updatedAt               DateTime            @updatedAt
-  assignments             ChannelAssignment[]
-  videos                  Video[]
+  id                 String              @id @default(cuid())
+  name               String
+  slug               String              @unique
+  url                String              @unique
+  sourceId           String?
+  contentType        ContentType
+  contentFilter      ContentFilter       @default(all)
+  backlogCount       Int                 @default(5)
+  watchedPolicy      RetentionPolicy     @default(keep)
+  watchedDelayHours  Int                 @default(0)
+  unwatchedPolicy    RetentionPolicy     @default(keep)
+  unwatchedDays      Int                 @default(30)
+  keepIfPlaylisted   Boolean             @default(true)
+  keepIfPinned       Boolean             @default(true)
+  isActive           Boolean             @default(true)
+  canonicalPath      String
+  lastPolledAt       DateTime?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  assignments        ChannelAssignment[]
+  videos             Video[]
 
   @@unique([name, contentType])
 }
 
 model ChannelAssignment {
   id        String   @id @default(cuid())
-  channelId String
-  userId    String
-  createdAt DateTime @default(now())
-  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channelId  String
+  userId     String
+  createdAt  DateTime @default(now())
+  channel    Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([channelId, userId])
 }
@@ -141,14 +112,14 @@ model Video {
 }
 
 model Job {
-  id        String    @id @default(cuid())
-  type      JobType
-  status    JobStatus @default(pending)
-  payload   String
-  attempts  Int       @default(0)
-  runAfter  DateTime  @default(now())
-  lockedAt  DateTime?
-  lastError String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id          String    @id @default(cuid())
+  type        JobType
+  status      JobStatus @default(pending)
+  payload     String
+  attempts    Int       @default(0)
+  runAfter    DateTime  @default(now())
+  lockedAt    DateTime?
+  lastError   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

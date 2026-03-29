@@ -3,76 +3,53 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TubeSubarr</title>
+    <title>TubSubarr</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <header class="hero panel">
-        <div class="hero-top">
+    <main class="layout">
+      <section class="panel">
+        <div class="panel-header">
           <div>
-            <p class="eyebrow">Subscription-first YouTube manager</p>
-            <h1>TubeSubarr</h1>
-            <p class="subtitle">Search, subscribe, and tune per-channel download rules without leaving the subscriptions view.</p>
-            <p id="app-version" class="version-label">v0.0.0</p>
-          </div>
-          <nav class="top-nav">
-            <button id="nav-subscriptions" class="ghost active">Subscriptions</button>
-            <button id="nav-settings" class="ghost">App defaults</button>
-          </nav>
-        </div>
-
-        <section class="smart-bar-wrap">
-          <div class="smart-bar">
-            <input id="smart-input" type="text" placeholder="Paste a YouTube channel URL, video URL, or search for a channel" autocomplete="off" />
-            <button id="primary-action">Search</button>
-          </div>
-          <div class="bar-meta">
-            <span id="mode-pill" class="pill">Idle</span>
-            <span id="mode-hint" class="muted">Paste a YouTube URL or search by channel name.</span>
-          </div>
-          <div id="secondary-actions" class="secondary-actions hidden"></div>
-          <div class="owners-row">
-            <span class="muted small-label">Subscribe for</span>
-            <div id="user-pills" class="pill-row"></div>
-          </div>
-        </section>
-      </header>
-
-      <section id="subscriptions-view" class="panel view-panel">
-        <div class="section-header">
-          <div>
-            <p class="eyebrow">Channels</p>
-            <h2 id="section-title">Subscriptions</h2>
-          </div>
-          <div class="header-actions">
-            <button id="back-to-subscriptions" class="ghost hidden">Back to subscriptions</button>
-            <button id="refresh-subscriptions" class="ghost">Refresh</button>
+            <h1>TubSubarr</h1>
+            <p>Self-hosted YouTube and podcast subscription ingestion for Jellyfin.</p>
           </div>
         </div>
-        <div id="subscriptions-status" class="muted"></div>
-        <div id="subscriptions-content" class="stack"></div>
+        <form id="subscription-form" class="form-grid">
+          <input name="name" placeholder="Channel name" required />
+          <input name="url" placeholder="https://youtube.com/@channel" required />
+          <select name="contentType">
+            <option value="youtube">YouTube</option>
+            <option value="podcast">Podcast</option>
+          </select>
+          <input name="backlogCount" type="number" min="1" value="5" />
+          <select name="contentFilter">
+            <option value="all">All</option>
+            <option value="podcast_only">Podcast only</option>
+            <option value="exclude_podcasts">Exclude podcasts</option>
+          </select>
+          <label class="checkbox"><input type="checkbox" name="isActive" checked /> Active</label>
+          <div id="user-checkboxes" class="user-checkboxes"></div>
+          <button type="submit">Add subscription</button>
+        </form>
       </section>
 
-      <section id="settings-view" class="panel view-panel hidden">
-        <div class="section-header">
-          <div>
-            <p class="eyebrow">Defaults</p>
-            <h2>App-wide settings</h2>
-          </div>
-          <button id="save-settings" class="ghost">Save defaults</button>
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Subscriptions</h2>
+          <button id="refresh-subscriptions">Refresh</button>
         </div>
-        <form id="app-settings-form" class="settings-form"></form>
+        <div id="subscriptions" class="card-list"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Videos</h2>
+          <button id="refresh-videos">Refresh</button>
+        </div>
+        <div id="videos" class="card-list"></div>
       </section>
     </main>
-
-    <template id="empty-state-template">
-      <article class="empty-state">
-        <h3>No subscriptions yet</h3>
-        <p>Paste a YouTube channel URL above or search for a creator to start building your library.</p>
-      </article>
-    </template>
-
     <script type="module" src="/app.js"></script>
   </body>
 </html>
